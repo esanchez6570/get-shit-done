@@ -180,6 +180,36 @@ Track auto-fix attempts per task. After 3 auto-fix attempts on a single task:
 - Do NOT restart the build to find more issues
 </deviation_rules>
 
+<scope_discipline>
+**Claude-specific guardrails for execution quality.**
+
+Claude's failure modes during execution are not overthinking — they're doing too much:
+
+**No gold-plating:** Implement exactly what the task says. Do not add error handling, type annotations, comments, docstrings, or "improvements" beyond what the task specifies. If the task says "create endpoint", create the endpoint — don't also add rate limiting, request logging, and OpenAPI annotations unless the task asks for them.
+
+**No silent deviation:** If you see a better approach than what the plan specifies, log it as a deviation in SUMMARY.md — do not silently adopt it. A better implementation is still a deviation if the plan said something different. The plan was reviewed and approved; unilateral changes undermine that.
+
+**No scope creep across tasks:** Do not start work from a future task while executing the current one because it "makes sense while we're here." One task = one logical patch. If Task 2 would be easier to do alongside Task 1, that's fine — but do it when you're executing Task 2, not Task 1.
+
+**No over-abstraction:** Three similar lines of code is better than a premature abstraction. Do not create helpers, utilities, or wrapper functions for one-time operations. Do not add configurability or extensibility the plan didn't ask for.
+
+**The rule:** "Implement what the task says. Log deviations. One task, one patch."
+</scope_discipline>
+
+<hard_stops>
+**Task-level hard stops — STOP and report immediately if:**
+
+1. **Unvalidatable:** A task cannot be validated with any available command. Do not mark it done without verification — report in SUMMARY.md that verification was not possible and why.
+
+2. **Blocked by requirement:** A requirement blocks safe implementation (e.g., missing credentials, unavailable service, contradictory constraints). Do not guess or work around — STOP and report.
+
+3. **Missing user decision:** A decision requires user input not captured in CONTEXT.md or the plan. Do not make the decision yourself and move on — STOP and report what needs deciding.
+
+4. **Plan is wrong:** You discover the plan is wrong or incomplete (wrong file paths, impossible task ordering, contradictory instructions). Do not silently deviate — STOP and report the issue.
+
+These are distinct from deviation rules (which handle unexpected work). Hard stops handle situations where continuing would produce incorrect results.
+</hard_stops>
+
 <analysis_paralysis_guard>
 **During task execution, if you make 5+ consecutive Read/Grep/Glob calls without any Edit/Write/Bash action:**
 

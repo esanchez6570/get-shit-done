@@ -37,6 +37,20 @@ Purpose: [Why this matters for the project]
 Output: [What artifacts will be created]
 </objective>
 
+<data_flow>
+[ASCII diagram showing inputs → processing → outputs for this plan.
+Makes the plan understandable at a glance for executors.]
+
+Example:
+```
+User submits form
+  → API validates input
+  → Service processes request
+  → Database persists result
+  → Response returned to client
+```
+</data_flow>
+
 <execution_context>
 @~/.claude/get-shit-done/workflows/execute-plan.md
 @~/.claude/get-shit-done/templates/summary.md
@@ -66,6 +80,7 @@ Output: [What artifacts will be created]
   <action>[Specific implementation - what to do, how to do it, what to avoid and WHY]</action>
   <verify>[Command or check to prove it worked]</verify>
   <done>[Measurable acceptance criteria]</done>
+  <summary>[2-3 sentences: what this task produces, key decisions, critical context for downstream. Anti-compaction safeguard — an agent reading only this summary should be able to continue.]</summary>
 </task>
 
 <task type="auto">
@@ -74,6 +89,7 @@ Output: [What artifacts will be created]
   <action>[Specific implementation]</action>
   <verify>[Command or check]</verify>
   <done>[Acceptance criteria]</done>
+  <summary>[2-3 sentences capturing what was done and critical context for the next task.]</summary>
 </task>
 
 <!-- For checkpoint task examples and patterns, see @~/.claude/get-shit-done/references/checkpoints.md -->
@@ -125,7 +141,7 @@ After completion, create `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 |-------|----------|---------|
 | `phase` | Yes | Phase identifier (e.g., `01-foundation`) |
 | `plan` | Yes | Plan number within phase (e.g., `01`, `02`) |
-| `type` | Yes | Always `execute` for standard plans, `tdd` for TDD plans |
+| `type` | Yes | `execute` for standard plans, `tdd` for TDD plans, `validation` for smoke test plans |
 | `wave` | Yes | Execution wave number (1, 2, 3...). Pre-computed at plan time. |
 | `depends_on` | Yes | Array of plan IDs this plan requires. |
 | `files_modified` | Yes | Files this plan touches. |

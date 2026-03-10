@@ -223,6 +223,29 @@ Structure the extracted information:
 **If no prior context exists:** Continue without — this is expected for early phases.
 </step>
 
+<step name="confirm_basics">
+Confirm the fundamental problem/scope/constraints before diving into gray areas. Mirrors feature-plan's "confirm basics (always ask)" pattern — ensures downstream agents receive clear context.
+
+**Read the phase description from ROADMAP.md.**
+
+Use AskUserQuestion:
+- header: "Basics"
+- question: "Before we dive into design decisions for Phase {X}: {Name}, let me confirm the fundamentals. Does the roadmap description cover the problem, scope, and constraints — or is there anything to add/clarify?"
+- options:
+  - "Roadmap covers it" — Phase description is sufficient, proceed to discussion
+  - "Let me clarify" — I have additional context about problem, scope, or constraints
+
+**If "Roadmap covers it":** Continue to scout_codebase. No friction added.
+
+**If "Let me clarify":** Ask follow-up using AskUserQuestion with freeform input:
+- header: "Clarify"
+- question: "What would you like to add or clarify? (Problem being solved, what's in/out of scope, hard constraints like time/tech/compliance)"
+
+Capture their response. Incorporate into the gray area analysis and eventually into CONTEXT.md's domain/decisions sections.
+
+**If user provides a PRD or spec:** Note the document path — suggest `/gsd:plan-phase {X} --prd path/to/doc.md` as an alternative to discussion.
+</step>
+
 <step name="scout_codebase">
 Lightweight scan of existing code to inform gray area identification and discussion. Uses ~10% context — acceptable for an interactive session.
 

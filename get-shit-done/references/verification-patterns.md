@@ -594,6 +594,64 @@ Some things can't be verified programmatically. Flag these for human testing:
 
 </human_verification_triggers>
 
+<smoke_test_patterns>
+
+## Smoke Test Patterns
+
+Smoke tests verify that critical paths work end-to-end before detailed manual testing. They're generated during planning (`type: validation` plans) and executed during verify-work before UAT.
+
+### Building a Smoke Matrix
+
+Target 5-8 test cases covering:
+
+**1. Happy path (always first):**
+- Complete the primary user journey start to finish
+- Example: Register → Login → Create item → View item → Logout
+
+**2. Critical error cases:**
+- Auth failures (wrong credentials, expired token, missing token)
+- Invalid input (missing required fields, wrong types, boundary values)
+- Not-found cases (accessing non-existent resources)
+
+**3. State transitions:**
+- Create → Read → Update → Delete
+- Status changes (pending → approved → completed)
+- Idempotency (same request twice should not create duplicates)
+
+**4. Build verification:**
+- `npm run build` / `cargo build` / equivalent passes
+- `npm test` / test suite passes
+- No TypeScript/compilation errors
+
+### Smoke Test Task Format
+
+```xml
+<task type="auto">
+  <name>Smoke: [scenario name]</name>
+  <files></files>
+  <action>[Specific steps to execute the test — curl commands, UI interactions, CLI invocations]</action>
+  <verify>[Command that proves success — HTTP status, output check, file existence]</verify>
+  <done>[Observable outcome: "Returns 200 with user object" or "Build succeeds with 0 errors"]</done>
+  <summary>[What this test validates and why it matters for the phase goal]</summary>
+</task>
+```
+
+### Stack-Agnostic Verification
+
+GSD smoke tests work with any stack. The validation plan specifies verification commands appropriate for the project:
+
+| Stack | Typical Verification |
+|-------|---------------------|
+| Web API | `curl` commands checking status codes and response bodies |
+| CLI tool | Command invocations checking exit codes and stdout |
+| Library | Test suite execution checking pass/fail |
+| UI app | Build check + dev server startup + health endpoint |
+| Database | Migration status + seed data verification |
+
+Do not hardcode assumptions about PostgreSQL, React, or any specific technology. The planner knows the stack and writes appropriate verification commands.
+
+</smoke_test_patterns>
+
 <checkpoint_automation_reference>
 
 ## Pre-Checkpoint Automation

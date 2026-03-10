@@ -427,6 +427,21 @@ Purpose: [Why this matters]
 Output: [Artifacts created]
 </objective>
 
+<data_flow>
+[ASCII diagram showing inputs → processing → outputs for this plan.
+Show how data/control flows through the components this plan creates.
+This makes the plan understandable at a glance for executors.]
+
+Example:
+```
+User submits form
+  → API validates input
+  → Service processes request
+  → Database persists result
+  → Response returned to client
+```
+</data_flow>
+
 <execution_context>
 @~/.claude/get-shit-done/workflows/execute-plan.md
 @~/.claude/get-shit-done/templates/summary.md
@@ -449,6 +464,7 @@ Output: [Artifacts created]
   <action>[Specific implementation]</action>
   <verify>[Command or check]</verify>
   <done>[Acceptance criteria]</done>
+  <summary>[2-3 sentences: what this task produces, key decisions made, critical context for downstream tasks. An agent reading ONLY this summary should understand what exists and can continue work.]</summary>
 </task>
 
 </tasks>
@@ -1133,6 +1149,50 @@ Apply goal-backward methodology (see goal_backward section):
 3. Derive required artifacts (specific files)
 4. Derive required wiring (connections)
 5. Identify key links (critical connections)
+</step>
+
+<step name="generate_smoke_test_plan">
+After all implementation plans are created, generate a final validation plan as the last plan in the phase.
+
+This plan has `type: validation` in frontmatter, is placed in the last wave (depends on all other plans), and defines the smoke test matrix for the phase.
+
+```yaml
+---
+phase: XX-name
+plan: NN              # Last plan number
+type: validation
+wave: N               # Last wave (depends on all implementation plans)
+depends_on: [...]     # All other plan IDs in this phase
+files_modified: []    # Validation plans don't modify source code
+autonomous: true
+requirements: []      # Covers same requirements as implementation plans
+must_haves:
+  truths: []
+  artifacts: []
+  key_links: []
+---
+```
+
+**Tasks in the validation plan use the same XML format but describe test executions:**
+
+```xml
+<task type="auto">
+  <name>Smoke: Happy path — [user journey]</name>
+  <files></files>
+  <action>Execute the primary user journey end-to-end: [specific steps, curl commands, UI interactions]</action>
+  <verify>[Command that proves the journey succeeded]</verify>
+  <done>[Observable outcome confirming the feature works]</done>
+  <summary>Happy path smoke test covering [journey]. Validates the core value proposition of the phase.</summary>
+</task>
+```
+
+**The smoke test plan should include 5-8 tasks covering:**
+- Happy-path flow (start to finish)
+- Critical error cases (auth failures, invalid inputs, bad state)
+- Edge cases specific to the phase domain
+- Build/compile verification (`npm run build`, `npm test`, etc.)
+
+**Skip this step if:** The phase is pure infrastructure with no user-observable behavior (config, migrations, tooling setup).
 </step>
 
 <step name="estimate_scope">

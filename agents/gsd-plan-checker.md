@@ -314,6 +314,69 @@ issue:
   fix_hint: "Remove search task - belongs in future phase per user decision"
 ```
 
+## Dimension 9: Plan Richness
+
+**Question:** Do plans include data flow diagrams, anti-compaction summaries, and explicit file paths per task?
+
+**Process:**
+1. Check each plan has a `<data_flow>` section with an ASCII diagram showing inputs → processing → outputs
+2. Check each `<task>` has a `<summary>` element (2-3 sentences capturing what the task produces and critical context)
+3. Check each `<task>` has a `<files>` element with concrete file paths (not vague descriptions)
+4. Check each `<task>` has a `<verify>` element with a runnable command
+5. Verify no task depends on "finishing the whole thing" to be verified — each task should be independently testable
+
+**Red flags:**
+- Missing `<data_flow>` section entirely
+- `<summary>` missing from tasks — context will be lost across sessions
+- `<files>` contains vague references ("the auth files") instead of paths
+- `<verify>` says "it works" instead of a concrete command
+- Task verification requires all other tasks to be complete first
+
+**Severity:**
+- Missing `<data_flow>`: **warning** — plan is harder to understand but still executable
+- Missing `<summary>` on tasks: **warning** — context rot risk across sessions
+- Missing `<files>` or `<verify>`: **blocker** — executor can't act without these (also caught by Dimension 2)
+- Non-independent verification: **warning** — reduces ability to validate incrementally
+
+**Example issue:**
+```yaml
+issue:
+  dimension: plan_richness
+  severity: warning
+  description: "Plan 01 missing <data_flow> section — executors won't have visual overview"
+  plan: "01"
+  fix_hint: "Add ASCII diagram showing data flow through components this plan creates"
+```
+
+## Dimension 10: Validation Plan Presence
+
+**Question:** Does the phase include a smoke test validation plan as the final plan?
+
+**Skip if:** Phase is pure infrastructure (config, migrations, tooling) with no user-observable behavior.
+
+**Process:**
+1. Check if any plan in the phase has `type: validation` in frontmatter
+2. If present, verify it's in the last wave (depends on all implementation plans)
+3. Verify it has 5-8 tasks covering: happy path, error cases, edge cases, build verification
+
+**Red flags:**
+- No validation plan exists for a phase with user-observable features
+- Validation plan doesn't depend on all implementation plans
+- Validation plan has fewer than 3 test cases
+
+**Severity:**
+- Missing validation plan: **warning** — verify-work will skip automated smoke testing
+- Validation plan with broken dependencies: **blocker** — tests would run before implementation
+
+**Example issue:**
+```yaml
+issue:
+  dimension: validation_plan_presence
+  severity: warning
+  description: "Phase has user-facing features but no validation plan (type: validation)"
+  fix_hint: "Add a final plan with type: validation containing smoke test matrix"
+```
+
 ## Dimension 8: Nyquist Compliance
 
 Skip if: `workflow.nyquist_validation` is explicitly set to `false` in config.json (absent key = enabled), phase has no RESEARCH.md, or RESEARCH.md has no "Validation Architecture" section. Output: "Dimension 8: SKIPPED (nyquist_validation disabled or not applicable)"

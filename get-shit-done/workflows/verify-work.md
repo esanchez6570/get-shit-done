@@ -90,6 +90,70 @@ ls "$phase_dir"/*-SUMMARY.md 2>/dev/null
 Read each SUMMARY.md to extract testable deliverables.
 </step>
 
+<step name="automated_smoke">
+**Run automated smoke tests before manual UAT.**
+
+Check if a validation plan exists for this phase:
+
+```bash
+grep -l "type: validation" "$phase_dir"/*-PLAN.md 2>/dev/null
+```
+
+**If no validation plan found:** Skip this step, proceed to extract_tests. Backward compatible — phases without smoke plans go straight to UAT.
+
+**If validation plan found:**
+
+1. Read the validation plan's tasks (the smoke test matrix)
+2. Display banner:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ GSD ► AUTOMATED SMOKE TESTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Running {N} automated tests before manual UAT...
+```
+
+3. For each test task in the validation plan:
+   - Execute the `<verify>` command
+   - Record: test name, command, expected outcome, actual outcome, PASS/FAIL
+   - **Stop on blocker failures** that invalidate the rest of the flow (e.g., server won't start)
+
+4. Display results:
+```
+## Automated Smoke Results
+
+| # | Test | Command | Result |
+|---|------|---------|--------|
+| 1 | Happy path login | curl -X POST /api/auth/login | ✓ PASS |
+| 2 | Invalid credentials | curl -X POST /api/auth/login (bad pw) | ✓ PASS |
+| 3 | Build check | npm run build | ✗ FAIL |
+
+{passed}/{total} automated tests passed.
+```
+
+5. Write automated results as a section at the top of UAT.md (before manual tests):
+```markdown
+## Automated Smoke Tests
+
+source: {validation-plan-path}
+ran: [ISO timestamp]
+
+| # | Test | Result | Details |
+|---|------|--------|---------|
+| 1 | {name} | pass | {verify command output summary} |
+| 2 | {name} | fail | {error details} |
+
+automated_passed: {N}
+automated_failed: {N}
+```
+
+6. If any automated tests fail:
+   - Flag them as known issues — they'll appear in the Gaps section if not resolved during UAT
+   - Continue to manual UAT (don't block on automated failures — user may want to test anyway)
+
+**Key principle:** GSD is stack-agnostic. The smoke plan specifies whatever verification is appropriate (API calls, build checks, file existence, DB queries, etc.) and this step executes whatever the plan says. No hardcoded PostgreSQL or curl assumptions.
+</step>
+
 <step name="extract_tests">
 **Extract testable deliverables from SUMMARY.md:**
 

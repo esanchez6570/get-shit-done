@@ -313,20 +313,25 @@ Planner prompt:
 </planning_context>
 
 <downstream_consumer>
-Output consumed by /gsd:execute-phase. Plans need:
+Output consumed by /gsd:execute-phase AND /gsd:verify-work. Plans need:
 - Frontmatter (wave, depends_on, files_modified, autonomous)
-- Tasks in XML format
+- Tasks in XML format with <summary> elements (anti-compaction)
+- <data_flow> section with ASCII diagram per plan
 - Verification criteria
 - must_haves for goal-backward verification
+- Final plan with type: validation (smoke test matrix for verify-work)
 </downstream_consumer>
 
 <quality_gate>
 - [ ] PLAN.md files created in phase directory
 - [ ] Each plan has valid frontmatter
+- [ ] Each plan has <data_flow> section with ASCII diagram
+- [ ] Each task has <summary> element for context preservation
 - [ ] Tasks are specific and actionable
 - [ ] Dependencies correctly identified
 - [ ] Waves assigned for parallel execution
 - [ ] must_haves derived from phase goal
+- [ ] Final plan has type: validation with smoke test matrix (unless pure infrastructure)
 </quality_gate>
 ```
 
