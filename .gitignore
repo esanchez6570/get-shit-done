@@ -8,6 +8,9 @@ commands.html
 # Local test installs
 .claude/
 
+# Local dev VERSION (written by setup-local.sh, published by install.js)
+get-shit-done/VERSION
+
 # Build artifacts (committed to npm, not git)
 hooks/dist/
 

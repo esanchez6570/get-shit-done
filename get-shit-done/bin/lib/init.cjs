@@ -27,6 +27,8 @@ function cmdInitExecutePhase(cwd, phase, raw) {
     // Models
     executor_model: resolveModelInternal(cwd, 'gsd-executor'),
     verifier_model: resolveModelInternal(cwd, 'gsd-verifier'),
+    code_reviewer_model: resolveModelInternal(cwd, 'gsd-code-reviewer'),
+    security_reviewer_model: resolveModelInternal(cwd, 'gsd-security-reviewer'),
 
     // Config flags
     commit_docs: config.commit_docs,

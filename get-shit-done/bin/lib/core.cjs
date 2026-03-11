@@ -28,6 +28,11 @@ const MODEL_PROFILES = {
   'gsd-plan-checker':         { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
   'gsd-integration-checker':  { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
   'gsd-nyquist-auditor':      { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
+  'gsd-code-reviewer':        { quality: 'opus',   balanced: 'sonnet', budget: 'sonnet' },
+  'gsd-database-reviewer':    { quality: 'opus',   balanced: 'sonnet', budget: 'sonnet' },
+  'gsd-go-reviewer':          { quality: 'opus',   balanced: 'sonnet', budget: 'sonnet' },
+  'gsd-python-reviewer':      { quality: 'opus',   balanced: 'sonnet', budget: 'sonnet' },
+  'gsd-security-reviewer':    { quality: 'opus',   balanced: 'sonnet', budget: 'sonnet' },
 };
 
 // ─── Output helpers ───────────────────────────────────────────────────────────

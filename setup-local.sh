@@ -239,7 +239,13 @@ fs.writeFileSync(process.argv[3], JSON.stringify(settings, null, 2) + '\n');
 
 info "Updated settings.json (statusline + hooks)"
 
-# ── 6. Ensure package.json for CommonJS ───────────────
+# ── 6. Write VERSION file ─────────────────────────────
+
+VERSION=$(node -p "require('$REPO_DIR/package.json').version")
+echo -n "$VERSION" > "$REPO_DIR/get-shit-done/VERSION"
+info "Wrote VERSION ($VERSION)"
+
+# ── 7. Ensure package.json for CommonJS ───────────────
 
 if [[ ! -f "$CLAUDE_DIR/package.json" ]]; then
   echo '{"type":"commonjs"}' > "$CLAUDE_DIR/package.json"

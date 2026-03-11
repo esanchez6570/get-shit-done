@@ -59,15 +59,21 @@ const child = spawn(process.execPath, ['-e', `
     }
   } catch (e) {}
 
-  let latest = null;
+  // Compare local HEAD against remote HEAD to detect new commits on fork
+  // Resolve symlinks then find git repo root
+  let update_available = false;
   try {
-    latest = execSync('npm view get-shit-done-cc version', { encoding: 'utf8', timeout: 10000, windowsHide: true }).trim();
+    const realDir = fs.realpathSync(globalVersionFile.replace('/VERSION', ''));
+    const repoRoot = execSync('git -C "' + realDir + '" rev-parse --show-toplevel 2>/dev/null', { encoding: 'utf8', timeout: 5000, windowsHide: true, shell: true }).trim();
+    const localHead = execSync('git -C "' + repoRoot + '" rev-parse HEAD 2>/dev/null', { encoding: 'utf8', timeout: 5000, windowsHide: true, shell: true }).trim();
+    const remoteHead = execSync('git ls-remote https://github.com/esanchez6570/get-shit-done.git HEAD 2>/dev/null | cut -f1', { encoding: 'utf8', timeout: 10000, windowsHide: true, shell: true }).trim();
+    update_available = !!(localHead && remoteHead && localHead !== remoteHead);
   } catch (e) {}
 
   const result = {
-    update_available: latest && installed !== latest,
+    update_available,
     installed,
-    latest: latest || 'unknown',
+    latest: update_available ? 'new commits available' : installed,
     checked: Math.floor(Date.now() / 1000)
   };
 
